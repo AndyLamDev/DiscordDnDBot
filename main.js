@@ -18,6 +18,10 @@ var prefix = '-';
 const https = require('https')
 //const request = require('request');
 
+//Notes: Add Help command
+//      MongoDB for npc Command
+//      Host bot
+
 
 bot.on('ready', () =>
 {
@@ -25,13 +29,6 @@ bot.on('ready', () =>
 
     //this will send a message in EVERY TEXT CHANNEL
     //seems that if you want a bot that only sends to a specific channel you NEED the ID of that channel
-
-    // bot.channels.cache.forEach(channel => {
-    //     if(channel.type == 'text')
-    //     {
-    //         channel.send("WORKING");
-    //     }
-    // });
 
     //isnt this suppose to find ALL the text channels? why does it only send to one
     //.Find will stop at the first valid answer
@@ -55,7 +52,7 @@ bot.on('message', (msg) =>
 
     //Dice Rolling msg    
 
-    if(msg.content.includes(prefix+'rollAD'))
+    if(msg.content.includes(prefix+'rollADV'))
     {
         //ex -rollAD d20
 
@@ -111,6 +108,7 @@ bot.on('message', (msg) =>
         var SpellName = new Array();
         var SpellLevel = 0;
 
+        //if the last element is anumber then update the spell level
         if(!isNaN(commandIn[commandIn.length-1]))
             SpellLevel = commandIn[commandIn.length-1];
 
@@ -148,9 +146,13 @@ bot.on('message', (msg) =>
                 }
                 else
                 {
-                    var SpellTest = new Spell(SpellIn);  
-                    SpellTest.SpellLevel(SpellLevel);
-                    msg.reply(SpellTest.Output());
+                    var SpellTest = new Spell(SpellIn);       
+
+                    //if it has a damage prop then i have to test, if not then i can just output it               
+                    if(SpellTest.damage !== undefined)
+                        msg.reply(SpellTest.Output(SpellTest.SpellLevel(SpellLevel)));
+                    else
+                        msg.reply(SpellTest.Output(true))
                 }
             })
         }).on("error", (err) => {
@@ -176,16 +178,17 @@ function Roll_Dice(iNumTimes,iDiceType)
     //Roll for only a single die
     if(iNumTimes === 1)
     {
+        //rolls a die of determined size
         var tempNum = Math.floor(Math.random() * Math.floor(iDiceType)) + 1;    
-       return '\r\n**' + tempNum + '**';
+        return '\r\n**' + tempNum + '**';
     }
 
     for(var i = 0; i < iNumTimes; i++)
     {
-        var tempNum = Math.floor(Math.random() * Math.floor(iDiceType)) + 1;
-        Rolls.push(tempNum);            
+        Rolls.push(Math.floor(Math.random() * Math.floor(iDiceType)) + 1);            
     }
 
+    //what does this do???
     Total = Rolls.reduce((add,current) => (add+current));
 
     if(iNumTimes > 20)
@@ -196,15 +199,16 @@ function Roll_Dice(iNumTimes,iDiceType)
 
 function Roll_AdvDis(iDiceType)
 {
-    var Msg = Roll_Dice(2,iDiceType);
-    //2,3 Total: 5
-    var SplitOnComma = Msg.split(',');
-    //2nd element because 1st should be th first roll
-    var SplitOnSpace = SplitOnComma[1].split(' ');
+    var Rolls = new Array();
 
-    var AdvObj = CompareValues(SplitOnComma[0],SplitOnSpace[0]);
+    for(var i=0; i < 2; i++)
+    {
+        Rolls.push(Math.floor(Math.random() * Math.floor(iDiceType)) + 1);
+    }
 
-    return '\r\n' + SplitOnComma[0] + ',' + SplitOnSpace[0] + '\n__**Advantage:**__ ' + AdvObj['Adv'] + ' \n__**Disadvantage:**__ ' + AdvObj['Dis'];
+    var AdvObj = CompareValues(Rolls[0],Rolls[1]);
+
+    return '\r\n' + Rolls.join(',') + '\r\n__**Advantage:**__ ' + AdvObj['Adv'] + ' \r\n__**Disadvantage:**__ ' + AdvObj['Dis'];
 }
 
 //function will compare the 2 rolls and return an object that will have the advantage and disadvantage
@@ -299,11 +303,31 @@ class Spell
     //why is this not reading the input properly
     SpellLevel(SpellLvl)
     {
-        if(SpellLvl > 0)
+        if(SpellLvl > 0 && this.damage !== undefined)
+        {
+            //fix this for spells that do not deal damage
             this.Damage_per_Level = this.JSON.damage.damage_at_slot_level[SpellLvl];
+            console.log(this.Damage_per_Level);                      
+        }
+        
+        if(this.Damage_per_Level !== undefined)
+        {
+            console.log("jdasjdbka");
+            return true;
+        }
+        else
+        {
+            console.log("UN GERE");
+            return false;
+        }
+        
     }
-    Output()
+    Output(Exists)
     {     
+        if(!Exists)
+        {
+            return "Invaild Spell Level. Check the Player's Handbook!";
+        }
         var msg = '\r\n\n';
         
         for(var propt in this)
