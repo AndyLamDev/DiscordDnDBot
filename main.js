@@ -9,9 +9,11 @@ const { SSL_OP_NO_TLSv1 } = require('constants');
 //https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584#file-discordjs-cheatsheet-js-L22
 
 const Discord = require('discord.js');
+const result = require('dotenv').config()
 
 const bot = new Discord.Client();
-var token = "NzQ5NDg1MzUzMjgyMzA2MTI4.X0sqoA.5iXTHf9zGe_ZSNxdXhCPirppW0U";
+const token = process.env['DISCORD_BOT_TOKEN'];
+
 var prefix = '-';
 const https = require('https')
 //const request = require('request');
