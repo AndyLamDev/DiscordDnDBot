@@ -1,7 +1,4 @@
 const { SSL_OP_NO_TLSv1 } = require('constants');
-//Log:
-//Day 1: Got the Ping Pong to work Not sure is ERIS is gonna be able to do what im looking for but i might be able to do a mix of both eris and vanila
-//Gotta figure out how to do voice states, i hope theres a link or something
 //https://abal.moe/Eris/
 //https://discordjs.guide/creating-your-bot/#replying-to-messages
 //https://discord.js.org/#/
@@ -9,13 +6,12 @@ const { SSL_OP_NO_TLSv1 } = require('constants');
 //https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584#file-discordjs-cheatsheet-js-L22
 
 const Discord = require('discord.js');
-const result = require('dotenv').config()
-
+const result = require('dotenv').config();
 const bot = new Discord.Client();
 const token = process.env['DISCORD_BOT_TOKEN'];
 
 var prefix = '-';
-const https = require('https')
+const https = require('https');
 //const request = require('request');
 
 //Notes: Add Help command
@@ -149,8 +145,10 @@ bot.on('message', (msg) =>
                     var SpellTest = new Spell(SpellIn);       
 
                     //if it has a damage prop then i have to test, if not then i can just output it               
-                    if(SpellTest.damage !== undefined)
+                    if(SpellTest.hasOwnProperty('Damage_per_Level'))
+                    {
                         msg.reply(SpellTest.Output(SpellTest.SpellLevel(SpellLevel)));
+                    }
                     else
                         msg.reply(SpellTest.Output(true))
                 }
@@ -165,6 +163,15 @@ bot.on('message', (msg) =>
         msg.reply('pong');
         msg.channel.send('pong');
         console.log('The channel id is: '+ msg.channel.id);
+    }
+
+    if(msg.content === prefix+'help')
+    {
+        msg.reply('-rollADV d[4,6,8,10,12,20] will roll 2 dice of specified size and give both the Advantage roll and Disadvantage Roll\r\n'
+        + '-roll d[4,6,8,10,12,20] will roll a single dice of specified size\r\n'
+        + '-roll #d[4,6,8,10,12,20] will roll dice # number of times with a cap of 20 dice and display the total\r\n'
+        + '-spells [name of spell] will display all the information about a specified spell [spaces work]'
+        + '-npc add Not implemented yet');
     }
 });
 
@@ -274,10 +281,15 @@ class Spell
         this.Concentration = SpellJSON.concentration;
         this.Casting_Time = SpellJSON.casting_time;
         this.Level = SpellJSON.level;
+        
 
         //check to see if the spell does damage
-        if(SpellJSON.damage !== undefined)        
+        if(SpellJSON.hasOwnProperty('damage'))   
+        {     
+            this.Damage_At_Base_Level = this.JSON.damage.damage_at_slot_level[this.Level];
             this.Damage_Type = SpellJSON.damage.damage_type.name;            
+            console.log('has damage');
+        }
 
         this.School = SpellJSON.school.name;
 
@@ -288,40 +300,19 @@ class Spell
             this.Classes += ' ' + Cls.name;
         });
 
-        if(SpellJSON.dc !== undefined)
+        if(SpellJSON.hasOwnProperty('dc'))
         {
             this.DC_Type = SpellJSON.dc.dc_type.name;
             this.DC_Success = SpellJSON.dc.dc_success;
             this.DC_Description = SpellJSON.dc.desc;
         }
-        if(SpellJSON.area_of_effect !== undefined)
+        if(SpellJSON.hasOwnProperty('area_of_effect'))
         {
             this.Area_of_Effect_Shape = SpellJSON.area_of_effect.type;
             this.Area_of_Effect_Size = SpellJSON.area_of_effect.size;
         }
     }
     //why is this not reading the input properly
-    SpellLevel(SpellLvl)
-    {
-        if(SpellLvl > 0 && this.damage !== undefined)
-        {
-            //fix this for spells that do not deal damage
-            this.Damage_per_Level = this.JSON.damage.damage_at_slot_level[SpellLvl];
-            console.log(this.Damage_per_Level);                      
-        }
-        
-        if(this.Damage_per_Level !== undefined)
-        {
-            console.log("jdasjdbka");
-            return true;
-        }
-        else
-        {
-            console.log("UN GERE");
-            return false;
-        }
-        
-    }
     Output(Exists)
     {     
         if(!Exists)
@@ -340,4 +331,3 @@ class Spell
 }
 
 bot.login(token);
-//client.login('NzQ5NDg1MzUzMjgyMzA2MTI4.X0sqoA.5iXTHf9zGe_ZSNxdXhCPirppW0U');
