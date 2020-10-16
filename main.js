@@ -158,20 +158,13 @@ bot.on('message', (msg) =>
         })
     }
 
-    if(msg.content === prefix+'ping')
-    {
-        msg.reply('pong');
-        msg.channel.send('pong');
-        console.log('The channel id is: '+ msg.channel.id);
-    }
-
     if(msg.content === prefix+'help')
     {
-        msg.reply('-rollADV d[4,6,8,10,12,20] will roll 2 dice of specified size and give both the Advantage roll and Disadvantage Roll\r\n'
-        + '-roll d[4,6,8,10,12,20] will roll a single dice of specified size\r\n'
-        + '-roll #d[4,6,8,10,12,20] will roll dice # number of times with a cap of 20 dice and display the total\r\n'
-        + '-spells [name of spell] will display all the information about a specified spell [spaces work]'
-        + '-npc add Not implemented yet');
+        msg.reply('\r\n__**rollADV d[4,6,8,10,12,20]**__ will roll 2 dice of specified size and give both the Advantage roll and Disadvantage Roll\r\n'
+        + '__**roll d[4,6,8,10,12,20]**__ will roll a single dice of specified size\r\n'
+        + '__**roll #d[4,6,8,10,12,20]**__ will roll dice # number of times with a cap of 20 dice and display the total\r\n'
+        + '__**spells [name of spell]**__ will display all the information about a specified spell (spaces work)\r\n'
+        + '__**npc add**__ Not implemented yet');
     }
 });
 
