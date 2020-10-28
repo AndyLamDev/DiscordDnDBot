@@ -12,6 +12,8 @@ const token = process.env['DISCORD_BOT_TOKEN'];
 
 var prefix = '-';
 const https = require('https');
+const mongoose = require('mongoose');
+//mongoose.connect('')
 //const request = require('request');
 
 //Notes: Add Help command
@@ -160,7 +162,8 @@ bot.on('message', (msg) =>
 
     if(msg.content === prefix+'help')
     {
-        msg.reply('\r\n__**rollADV d[4,6,8,10,12,20]**__ will roll 2 dice of specified size and give both the Advantage roll and Disadvantage Roll\r\n'
+        msg.reply('\r\nPREFIX - (Dash/Hyphen)'+ 
+        '\r\n__**rollADV d[4,6,8,10,12,20]**__ will roll 2 dice of specified size and give both the Advantage roll and Disadvantage Roll\r\n'
         + '__**roll d[4,6,8,10,12,20]**__ will roll a single dice of specified size\r\n'
         + '__**roll #d[4,6,8,10,12,20]**__ will roll dice # number of times with a cap of 20 dice and display the total\r\n'
         + '__**spells [name of spell]**__ will display all the information about a specified spell (spaces work)\r\n'
